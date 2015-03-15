@@ -29,7 +29,7 @@ static NSString *const BaseURLString = @"http://preview.hardver.ba/users/api/tok
     // Do any additional setup after loading the view, typically from a nib.
     
     
-    self.view.backgroundColor = [self colorWithHexString:@"C8C6C4"];
+    self.view.backgroundColor = [self colorWithHexString:@"34495e"];
     [self createMenu];
 }
 
@@ -37,7 +37,10 @@ static NSString *const BaseURLString = @"http://preview.hardver.ba/users/api/tok
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
-
+- (UIStatusBarStyle)preferredStatusBarStyle
+{
+    return UIStatusBarStyleLightContent;
+}
 - (void)createMenu {
     
     CGRect screenRect = [[UIScreen mainScreen] bounds];
@@ -58,6 +61,7 @@ static NSString *const BaseURLString = @"http://preview.hardver.ba/users/api/tok
     password.autocorrectionType = UITextAutocorrectionTypeNo;
     password.returnKeyType = UIReturnKeyDone;
     password.borderStyle = UITextBorderStyleRoundedRect;
+    password.delegate = self;
     [self.view addSubview:password];
     
     UIButton *logIn = [UIButton buttonWithType:UIButtonTypeRoundedRect];
@@ -112,30 +116,32 @@ static NSString *const BaseURLString = @"http://preview.hardver.ba/users/api/tok
 - (void)logInBtnAct{
     if ([password.text isEqualToString:@""] || [userName.text isEqualToString:@""]) {
         UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"SORRY!" message:@"Enter Missing Data" delegate:self cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
-        [alert show];}
-    NSURL *url = [NSURL URLWithString:BaseURLString];
-    
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
-    
-    NSString * grant_type = [NSString stringWithFormat:@"grant_type=password&username=%@&password=%@",userName.text,password.text];
-
-    
-    [request setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-type"];
-    
-    NSString *bodydata=[NSString stringWithFormat:@"%@",grant_type];
-    [request setHTTPMethod:@"POST"];
-    NSData *req=[NSData dataWithBytes:[bodydata UTF8String] length:[bodydata length]];
-    
-    
-    [request setHTTPBody:req];
-    
-    NSURLConnection *connection = [[NSURLConnection alloc]initWithRequest:request delegate:self];
-    
-    if( connection )
-    {
-        getResponseData = [NSMutableData new];
+        [alert show];
     }
+    else{
+        NSURL *url = [NSURL URLWithString:BaseURLString];
+    
+        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
+    
+        NSString * grant_type = [NSString stringWithFormat:@"grant_type=password&username=%@&password=%@",userName.text,password.text];
 
+    
+        [request setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-type"];
+    
+        NSString *bodydata=[NSString stringWithFormat:@"%@",grant_type];
+        [request setHTTPMethod:@"POST"];
+        NSData *req=[NSData dataWithBytes:[bodydata UTF8String] length:[bodydata length]];
+    
+    
+        [request setHTTPBody:req];
+    
+        NSURLConnection *connection = [[NSURLConnection alloc]initWithRequest:request delegate:self];
+    
+        if( connection )
+        {
+            getResponseData = [NSMutableData new];
+        }
+    }
 }
 
 - (void)signUpBtnAct{

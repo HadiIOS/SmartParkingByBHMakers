@@ -9,7 +9,7 @@
 #import "DataClass.h"
 
 @implementation DataClass
-@synthesize token, parkingData, index;
+@synthesize token, parkingData, index, exParkingPID, exParkingId;
 
 static DataClass *instance = nil;
 

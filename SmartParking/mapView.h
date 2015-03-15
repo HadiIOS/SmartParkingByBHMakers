@@ -7,10 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
-#import <CoreLocation/CoreLocation.h>
 
 @interface mapView : UIViewController
 
-@property (nonatomic,retain) CLLocationManager *locationManager;
 
 @end

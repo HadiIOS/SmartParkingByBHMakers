@@ -11,16 +11,27 @@
 
 static NSString *const BaseURLString = @"http://preview.hardver.ba/Users/api/account";
 
-@interface profileInfo (){
-    
+@interface profileInfo ()<UITableViewDataSource, UITableViewDelegate>{
+    UILabel *userName;
+    UILabel *name;
+    UILabel *lastName;
+    UILabel *country;
+    UILabel *email;
+    UILabel *address;
+    UILabel *balance;
+
     NSMutableData *getResponseData;
     DataClass *dataClass;
+    UITableView *table;
+
 }
+@property (nonatomic, strong) NSArray *tableData;
+@property (strong, nonatomic) IBOutlet UITableView *table;
 
 @end
 
 @implementation profileInfo
-
+@synthesize tableData, table;
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
@@ -42,9 +53,8 @@ static NSString *const BaseURLString = @"http://preview.hardver.ba/Users/api/acc
     [self.view addSubview:navBar];
     
     
-    self.view.backgroundColor = [self colorWithHexString:@"C8C6C4"];
+    self.view.backgroundColor = [self colorWithHexString:@"2c3e50"];
     [self.view setTintColor:[UIColor whiteColor]];
-    
     NSString *authStr = [NSString stringWithFormat:@"Bearer %@",dataClass.token];
 
     NSURL *url = [NSURL URLWithString:BaseURLString];
@@ -56,11 +66,24 @@ static NSString *const BaseURLString = @"http://preview.hardver.ba/Users/api/acc
     {
         getResponseData = [NSMutableData new];
     }
+    
+    table = [[UITableView alloc]initWithFrame:CGRectMake(0, self.view.frame.size.height -  350, self.view.frame.size.width, 350)];
+    table.dataSource = self;
+    table.delegate = self;
+    table.scrollEnabled = NO;
+    table.rowHeight = 50;
+    table.center = self.view.center;
+    [self.view addSubview:table];
 }
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+-(void) createLabels{
+
+
 }
 
 - (UIStatusBarStyle)preferredStatusBarStyle
@@ -124,6 +147,58 @@ static NSString *const BaseURLString = @"http://preview.hardver.ba/Users/api/acc
 {
     NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:getResponseData options:NSJSONReadingAllowFragments error:nil];
     NSLog(@"return: %@", dict);
+    
+    tableData = [[NSArray alloc]initWithObjects:[dict objectForKey:@"username"], [[dict objectForKey:@"firstName"] capitalizedString],[[dict objectForKey:@"lastName"] capitalizedString], [dict objectForKey:@"email"], [dict objectForKey:@"address"], [dict objectForKey:@"city"], [[dict objectForKey:@"balance"] stringValue], nil];
+    [table reloadData];
+    }
+
+#pragma mark - UITableView Datasource
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    
+    return [self.tableData count];
 }
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    static NSString *cellIdentifier = @"Cell";
+    
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
+    
+    if (cell == nil) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:cellIdentifier];
+    }
+    cell.backgroundColor = [self colorWithHexString:@"2c3e50"];
+    cell.textLabel.textColor = [UIColor whiteColor];
+    cell.detailTextLabel.textColor = [self colorWithHexString:@"0088BF"];
+    cell.textLabel.text = [tableData objectAtIndex:indexPath.row];
+    switch (indexPath.row) {
+            
+        case 0:
+            cell.detailTextLabel.text = @"Username";
+            break;
+        case 1:
+            cell.detailTextLabel.text = @"First Name";
+            break;
+        case 2:
+            cell.detailTextLabel.text = @"Last Name";
+            break;
+        case 3:
+            cell.detailTextLabel.text = @"Email";
+            break;
+        case 4:
+            cell.detailTextLabel.text = @"Address";
+            break;
+        case 5:
+            cell.detailTextLabel.text = @"City";
+            break;
+        case 6:
+            cell.detailTextLabel.text = @"Balance";
+            break;
+        default:
+            break;
+    }
+    return cell;
+}
+
 
 @end

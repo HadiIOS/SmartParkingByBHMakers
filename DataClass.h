@@ -13,12 +13,16 @@
     NSString *token;
     NSArray *parkingData;
     int index;
-    
+    NSString *exParkingId;
+    NSString *exParkingPID;
 }
 
 @property(nonatomic,retain)NSString *token;
 @property(nonatomic,retain)NSArray *parkingData;
+@property(nonatomic,retain)NSString *exParkingId;
+@property(nonatomic,retain)NSString *exParkingPID;
 @property int index;
+
 +(DataClass*)getInstance;
 
 @end

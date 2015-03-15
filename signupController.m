@@ -51,7 +51,7 @@ static NSString *const BaseURLString = @"http://preview.hardver.ba/users/api/reg
     [self.view addSubview:navBar];
     
     
-    self.view.backgroundColor = [self colorWithHexString:@"C8C6C4"];
+    self.view.backgroundColor = [self colorWithHexString:@"34495e"];
     [self.view setTintColor:[UIColor whiteColor]];
     [self createSignUpForm];
 }
@@ -74,7 +74,7 @@ static NSString *const BaseURLString = @"http://preview.hardver.ba/users/api/reg
 
     CGFloat y = 10;
     
-    UIView *menuView = [[UIView alloc]init];
+    UIScrollView *menuView = [[UIScrollView alloc]initWithFrame:CGRectMake(0, 64, screenWidth, screenHeight - 64)];
     userName = [[UITextField alloc]initWithFrame:CGRectMake(40, y, screenWidth - 80, 40)];
     userName.placeholder = @" User Name";
     userName.autocorrectionType = UITextAutocorrectionTypeNo;
@@ -156,7 +156,7 @@ static NSString *const BaseURLString = @"http://preview.hardver.ba/users/api/reg
     
     country = [UIButton buttonWithType:UIButtonTypeRoundedRect];
     [country addTarget:self action:@selector(countrySelect) forControlEvents:UIControlEventTouchUpInside];
-    [country setTitle:@" Country" forState:UIControlStateNormal];
+    [country setTitle:@" City" forState:UIControlStateNormal];
     [country setFrame:CGRectMake(40, y, screenWidth - 80, 40)];
     [country setBackgroundColor:[UIColor whiteColor]];
     country.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
@@ -178,8 +178,8 @@ static NSString *const BaseURLString = @"http://preview.hardver.ba/users/api/reg
     countriesTable = [[UITableView alloc]initWithFrame:CGRectMake(0, screenHeight, screenWidth, screenHeight)];
     countriesTable.dataSource = self;
     countriesTable.delegate = self;
-    menuView.frame = CGRectMake(0, 0, self.view.frame.size.width, y);
-    menuView.center = self.view.center;
+    menuView.contentSize = CGSizeMake(self.view.frame.size.width, y);
+    menuView.scrollEnabled = YES;
     [self.view addSubview:menuView];
 }
 - (void)countrySelect{
@@ -193,12 +193,16 @@ static NSString *const BaseURLString = @"http://preview.hardver.ba/users/api/reg
         countriesTable.frame = CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height);
     }];
 }
+- (BOOL)textFieldShouldReturn:(UITextField *)textField{
+    
+    [textField resignFirstResponder];
+    return YES;
+}
 - (void)signUpBtnAct{
-    if ([userName.text isEqualToString:@""] || [name.text isEqualToString:@""] ||[lastName.text isEqualToString:@""] ||[password.text isEqualToString:@""] ||[rePassword.text isEqualToString:@""] ||[email.text isEqualToString:@""] ||[address.text isEqualToString:@""] ||[country.titleLabel.text isEqualToString:@" Country"]) {
+    if ([userName.text isEqualToString:@""] || [name.text isEqualToString:@""] ||[lastName.text isEqualToString:@""] ||[password.text isEqualToString:@""] ||[rePassword.text isEqualToString:@""] ||[email.text isEqualToString:@""] ||[address.text isEqualToString:@""] ||[country.titleLabel.text isEqualToString:@" City"]) {
         UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"SORRY!" message:@"Enter Missing Data" delegate:self cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
         [alert show];
     }else if ((int)[userName.text length] < 5){
-        NSLog(@"%lu",[userName.text length]);
         
         UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"SORRY!" message:@"Minimum length of username is 5 characters" delegate:self cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
         [alert show];
@@ -216,26 +220,16 @@ static NSString *const BaseURLString = @"http://preview.hardver.ba/users/api/reg
     }else{
         
         NSArray *dictionaryKeys = @[@"username",@"password",@"firstName",@"lastName",@"email",@"address",@"city"];
-        
         NSArray *dictionaryValue = @[userName.text,password.text,name.text,lastName.text,email.text,address.text,country.titleLabel.text];
         NSDictionary *newUserData = [NSDictionary dictionaryWithObjects:dictionaryValue forKeys:dictionaryKeys];
         NSString *jsonFormat = [self formatUserDataForUpload:newUserData];
         
         NSURL *url = [NSURL URLWithString:BaseURLString];
-        
         NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
-        
-        
-
-        // NSDictionary *parameters = @{@"data" : @"hello world"};
-        //{"data" = "your message"}
         [request setValue:@"application/json" forHTTPHeaderField:@"Content-type"];
-
         NSString *bodydata=[NSString stringWithFormat:@"%@",jsonFormat];
         [request setHTTPMethod:@"POST"];
         NSData *req=[NSData dataWithBytes:[bodydata UTF8String] length:[bodydata length]];
-        
-        
         [request setHTTPBody:req];
         
         NSURLConnection *connection = [[NSURLConnection alloc]initWithRequest:request delegate:self];
